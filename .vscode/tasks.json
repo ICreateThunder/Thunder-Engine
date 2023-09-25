@@ -45,7 +45,7 @@
                 "command": "${workspaceFolder}/build-all.sh"
             },
             "options": {
-                "cwd": "${workspaceFolder}/sandbox"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"
