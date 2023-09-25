@@ -29,7 +29,7 @@
                 "_UNICODE",
                 "KEXPORT"
             ],
-            "compilerPath": "[PATH HERE]",
+            "compilerPath": "C:\\Program Files\\LLVM\\bin\\clang.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
