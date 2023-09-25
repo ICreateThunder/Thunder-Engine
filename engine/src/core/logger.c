@@ -1,9 +1,14 @@
 #include "logger.h"
+#include "asserts.h"
 
 // TODO: Temporary usage of standard libraries to write out
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+
+void report_assertion_failure(const char* expression, const char* message, const char* file, i32 line) {
+    log_output(LOG_LEVEL_FATAL, "Assertion Failure: %s, message: %s, in file: %s, line: %d\n", expression, message, file, line);
+}
 
 b8 initialse_logging() {
     // TODO: Create logfile
@@ -14,8 +19,8 @@ void shutdown_logging() {
     // TODO: Cleanup logging/write queued entries
 }
 
-KAPI void log_output(log_level level, const char* message, ...) {
-    const char* level_strings[6] = {"[!] FATAL :: ", "[!] ERROR :: ", "[~] WARN :: ", "[-] INFO :: ", "[-] DEBUG :: ", "[-] TRACE :: "};
+void log_output(log_level level, const char* message, ...) {
+    const char* level_strings[6] = {"[!] FATAL :: ", "[!] ERROR :: ", "[-] WARN :: ", "[-] INFO :: ", "[-] DEBUG :: ", "[-] TRACE :: "};
     // b8 is_error = level < 2;
 
     char out_message[32000];
