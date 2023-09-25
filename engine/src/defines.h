@@ -1,4 +1,4 @@
-#pramga once
+#pragma once
 
 // Shorten the names of type to [first letter of type][number of bytes]
 
@@ -73,7 +73,7 @@ STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes");
 #error "Unknown platform!"
 #endif
 
-#ifndef KEXPORT
+#ifdef KEXPORT
 #ifdef _MSC_VER
 #define KAPI __declspec(dllexport)
 #else
