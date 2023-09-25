@@ -13,7 +13,7 @@ REM echo "Source Files:" %sourceFiles%
 SET assembly=sandbox
 SET compilerFlags=-g
 SET includeFlags=-Isrc -I../engine/src
-SET linkerFlags=-l../bin/ -lengine.lib
+SET linkerFlags=-L../bin/ -lengine.lib
 SET defines=-D_DEBUG -DKIMPORT
 
 ECHO "Building %assembly%..."
