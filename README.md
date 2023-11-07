@@ -6,7 +6,7 @@ This is a small project to learn and practice graphics and advanced C programmin
 
 ### Credits
 
-Thank you to "Travis Vroman" on YouTube, from which I have taken much code/ideas.
+Thank you to "Travis Vroman" on YouTube, from which I have derived a base of code/ideas.
 
 ## Specifications
 
