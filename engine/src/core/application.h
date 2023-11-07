@@ -10,6 +10,6 @@ typedef struct application_config {
     char* name;
 } application_config;
 
-KAPI b8 application_create();
+KAPI b8 application_create(application_config* config);
 
 KAPI b8 application_run();
