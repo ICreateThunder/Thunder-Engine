@@ -2,7 +2,7 @@
 
 #if KPLATFORM_LINUX
 
-#include "core/logger.h";
+#include "core/logger.h"
 
 #include <xcb/xcb.h>
 #include <X11/keysym.h>
