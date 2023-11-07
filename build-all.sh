@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set echo on
 
 echo "Building everything..."

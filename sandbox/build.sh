@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo echo on
 
 mkdir -p ../bin
@@ -7,9 +7,9 @@ sourceFiles=$(find . -type f -name "*.c")
 
 assembly="sandbox"
 compilerFlags="-g -fdeclspec -fPIC"
-includeFlags="=Isrc -I../engine/src/"
-linkerFlags="-../bin/ -lengine -Wl,-rpath,."
-defines="-D_DEBUG -DKEXPORT"
+includeFlags="-Isrc -I../engine/src/"
+linkerFlags="-L../bin/ -lengine -Wl,-rpath,."
+defines="-D_DEBUG -DKIMPORT"
 
-echo "Building $assembly
-clan $sourceFiles $compilerFlags -o ../bin/$assembly $defines $includeFlags $linkerFlags
+echo "Building $assembly"
+clang $sourceFiles $compilerFlags -o ../bin/$assembly $defines $includeFlags $linkerFlags
