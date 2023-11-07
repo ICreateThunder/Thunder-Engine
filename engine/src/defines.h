@@ -80,7 +80,7 @@ STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes");
 #define KAPI __attribute__((visibility("default")))
 #endif
 #else
-#ifndef _MSC_VER
+#ifdef _MSC_VER
 #define KAPI __declspec(dllimport)
 #else
 #define KAPI
