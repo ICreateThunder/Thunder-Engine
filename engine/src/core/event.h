@@ -96,16 +96,16 @@ typedef enum system_event_code {
 
     // Mouse moved
     /* Context usage:
-     * u8 x = data.data.u8[0];
+     * u8 z_delta = data.data.u8[0];
      */
-    EVENT_CODE_MOUSE_MOVED = 0x07,
+    EVENT_CODE_MOUSE_WHEEL = 0x07,
 
     // Resized/resolution changed from the OS.
     /* Context usage:
      * u16 width = data.data.u16[0];
      * u16 height = data.data.u16[1];
      */
-    EVENT_CODE_MOUSE_MOVED = 0x08,
+    EVENT_CODE_RESIZED = 0x08,
 
     MAX_EVENT_CODE = 0xFF
 } system_event_code;

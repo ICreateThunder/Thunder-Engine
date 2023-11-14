@@ -24,7 +24,7 @@ typedef struct event_system_state {
 static b8 is_initialised = FALSE;
 static event_system_state state;
 
-b8 event_initialse() {
+b8 event_initialise() {
     if (is_initialised == TRUE) { 
         return FALSE;
     }
@@ -112,4 +112,6 @@ b8 event_fire(u16 code, void* sender, event_context context) {
             return TRUE;
         }
     }
+
+    return FALSE;
 }
