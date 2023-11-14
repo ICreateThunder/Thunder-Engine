@@ -22,6 +22,7 @@ typedef struct event_context {
     } data;
 } event_context;
 
+// Should return true if handled
 typedef b8(*PFN_on_event)(u16 code, void* sender, void* listener_inst, event_context data);
 
 b8 event_initialise();
@@ -55,7 +56,7 @@ KAPI b8 event_unregister(u16 code, void* listener, PFN_on_event on_event);
  * @param data The event data.
  * @returns TRUE if the event is handled; otherwise FALSE.
 */
-KAPI b8 event_unregister(u16 code, void* listener, event_context context);
+KAPI b8 event_fire(u16 code, void* sender, event_context context);
 
 // System internal event codes. Application codes should use beyond 255.
 typedef enum system_event_code {
