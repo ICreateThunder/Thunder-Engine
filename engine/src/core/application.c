@@ -3,7 +3,8 @@
 
 #include "logger.h"
 #include "platform/platform.h"
-#include "kmemory.h"
+#include "core/kmemory.h"
+#include "core/event.h"
 
 typedef struct application_state {
     game* game_inst;
@@ -40,6 +41,11 @@ b8 application_create(game* game_inst) {
     app_state.is_running = TRUE;
     app_state.is_suspended = FALSE;
 
+    if (!event_initialise()) {
+        KFATAL("Event system failed to initialise. Application cannot continue.");
+        return FALSE;
+    }
+
     if (!platform_startup(&app_state.platform, game_inst->app_config.name,game_inst->app_config.start_x_pos, game_inst->app_config.start_y_pos, game_inst->app_config.start_width, game_inst->app_config.start_height)) {
         return FALSE;
     } 
@@ -58,9 +64,9 @@ b8 application_create(game* game_inst) {
 
 b8 application_run() {
     // TODO: Sort this code
-    char* memory_status = get_memory_usage_str();
+    void* memory_status = get_memory_usage_str();
     KINFO(memory_status);
-    free(memory_status);
+    kfree(memory_status, 0, MEMORY_TAG_UNKNOWN);
 
     while(app_state.is_running) {
         if (!platform_pump_messages(&app_state.platform)) {
@@ -83,6 +89,8 @@ b8 application_run() {
     }
 
     app_state.is_running = FALSE;
+
+    event_shutdown();
 
     platform_shutdown(&app_state.platform);
 
