@@ -3,10 +3,13 @@
 #include "defines.h"
 
 /*
- * Memory Layout
- * u64 capacity = number of elements that can be held
- * u64 length = number of elements currently contained
- * u64 stride = size of each element in bytes
+ *  - Memory Layout -
+ * Type   |   Name   | Description 
+ * ----------------------------------------------------------
+ * u64    | capacity | Number of elements that can be held
+ * u64    |  length  | Number of elements currently contained
+ * u64    |  stride  | Size of each element in bytes
+ * {DATA} |    --    | Data of array
  */
 
 enum {
