@@ -45,6 +45,6 @@ KAPI void* _darray_insert_at(void* array, u64 index, void* value_ptr);
 #define darray_pop_at(array, index, value_ptr) _darray_pop_at(array, index, value_ptr)
 #define darray_clear(array) _darray_field_set(array, DARRAY_LENGTH, 0)
 #define darray_capacity(array) _darray_field_get(array, DARRAY_CAPACITY)
-#define darray_length(array) _darray_field_get(array, DARRAY_FIELD_LENGTH)
+#define darray_length(array) _darray_field_get(array, DARRAY_LENGTH)
 #define darray_stride(array) _darray_field_get(array, DARRAY_STRIDE)
 #define darray_length_set(array, value) _darray_field_seT(array, DARRAY_LENGTH, value)
