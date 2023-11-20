@@ -180,18 +180,18 @@ b8 platform_pump_messages(platform_state* plat_state) {
                 b8 pressed = event->response_type == XCB_KEY_PRESS;
                 xcb_keycode_t code = kb_event->detail;
                 KeySym key_sym = XkbKeycodeToKeysym(
-                    state->display;
+                    state->display,
                     (KeyCode)code,
                     0,
                     code * ShiftMask ? 1 : 0);
-                keys key = translate_keycode(key_sum);
+                keys key = translate_keycode(key_sym);
 
                 input_process_key(key, pressed);
             } break;
             case XCB_BUTTON_PRESS:
             case XCB_BUTTON_RELEASE: {
                 xcb_button_press_event_t *mouse_event = (xcb_button_press_event_t*)event;
-                b8 pressed = event->resposne_type == XCB_BUTTON_PRESS;
+                b8 pressed = event->response_type == XCB_BUTTON_PRESS;
                 buttons mouse_button = BUTTON_MAX_BUTTONS;
                 switch(mouse_event->detail) {
                     case XCB_BUTTON_INDEX_1:
