@@ -166,12 +166,7 @@ b8 platform_pump_messages(platform_state* plat_state) {
 
     b8 quit_flagged = FALSE;
 
-    while (event != 0) {
-        event = xcb_poll_for_event(state->connection);
-        if (event == 0) {
-            break;
-        }
-    
+    while ((event = xcb_poll_for_event(state->connection))) {
 
         switch(event->response_type & ~0x80) {
             case XCB_KEY_PRESS:
@@ -183,7 +178,7 @@ b8 platform_pump_messages(platform_state* plat_state) {
                     state->display,
                     (KeyCode)code,
                     0,
-                    code * ShiftMask ? 1 : 0);
+                    code & ShiftMask ? 1 : 0);
                 keys key = translate_keycode(key_sym);
 
                 input_process_key(key, pressed);
