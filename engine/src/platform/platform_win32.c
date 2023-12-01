@@ -4,6 +4,7 @@
 
 #include "core/logger.h"
 #include "core/input.h"
+#include "core/event.h"
 
 #include "containers/darray.h"
 
@@ -205,8 +206,9 @@ LRESULT CALLBACK win32_process_message(HWND hwnd, u32 msg, WPARAM w_param, LPARA
         case WM_ERASEBKGND:
             return 1;
         case WM_CLOSE:
-            // TODO: Fire event for application quit
-            return 0;
+            event_context data = {};
+            event_fire(EVENT_CODE_APPLICATION_QUIT, 0, data);
+            return TRUE;
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;

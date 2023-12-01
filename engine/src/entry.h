@@ -37,7 +37,7 @@ int main(void) {
         return 2;
     }   
 
-    kfree(game_inst.state, sizeof(game_inst.state), MEMORY_TAG_GAME);
+    kfree(game_inst.state, sizeof(game_state), MEMORY_TAG_GAME);
 
     /* MEMORY STATUS AFTER SUBSYSTEMS SHUTDOWN */
     char* memory_status = get_memory_usage_str();
