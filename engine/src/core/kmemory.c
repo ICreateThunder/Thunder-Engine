@@ -40,7 +40,7 @@ void initialise_memory() {
 
 void shutdown_memory() {
     if (stats.total_allocated != 0) {
-        KERROR("Memory subsystem shutdown with outstanding memory allocated!");
+        KERROR("Memory subsystem shutdown with outstanding memory allocated! Outstanding: %i", stats.total_allocated);
     }
 }
 
@@ -82,7 +82,6 @@ void* kset_memory(void* dest, i32 value, u64 size) {
     return platform_set_memory(dest, value, size);
 }
 
-// FREE POINTER AFTER CALLED AND FINISHED
 char* get_memory_usage_str() {
     const u64 gib = 1024 * 1024 * 1024;
     const u64 mib = 1024 * 1024;
