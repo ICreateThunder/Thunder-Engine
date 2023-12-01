@@ -15,7 +15,7 @@ int main(void) {
 
     // Attempt to create game
     if (!create_game(&game_inst)) {
-        KFATAL("Could not create game!");
+        KFATAL("Could not create game");
         return -1;
     }
 
@@ -27,15 +27,22 @@ int main(void) {
 
     // Application initilisation
     if (!application_create(&game_inst)) {
-        KINFO("Application failed to create!");
+        KERROR("Application failed to create!");
         return 1;
     }
 
     // Begin the game loop
     if (!application_run()) {
-        KINFO("Application did not shutdown gracefully");
+        KERROR("Application did not shutdown gracefully!");
         return 2;
     }   
+
+    kfree(game_inst.state, sizeof(game_state), MEMORY_TAG_GAME);
+
+    /* MEMORY STATUS AFTER SUBSYSTEMS SHUTDOWN */
+    char* memory_status = get_memory_usage_str();
+    KINFO(memory_status);
+    kfree(memory_status, 0, MEMORY_TAG_STRING);
 
     shutdown_memory();
 
