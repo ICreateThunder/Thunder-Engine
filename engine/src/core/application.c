@@ -6,6 +6,9 @@
 #include "core/kmemory.h"
 #include "core/event.h"
 #include "core/input.h"
+#include "core/clock.h"
+
+#include "renderer/renderer_frontend.h"
 
 typedef struct application_state {
     game* game_inst;
@@ -14,6 +17,7 @@ typedef struct application_state {
     platform_state platform;
     i16 width;
     i16 height;
+    clock clock;
     f64 last_time;
 } application_state;
 
@@ -33,21 +37,22 @@ b8 application_create(game* game_inst) {
 
     // Initialise subsystems
     initialse_logging();
-    input_initialise();
 
-    // TODO: Remove after testing/adding more functionality
+    KTRACE("Logger level test:\n\n");
     KFATAL("Something went wrong: %f", 3.14f);
     KERROR("Something went wrong: %f", 3.14f)
     KWARN("Something went wrong: %f", 3.14f);
     KINFO("Something went wrong: %f", 3.14f);
     KDEBUG("Something went wrong: %f", 3.14f);
-    KTRACE("Something went wrong: %f", 3.14f);
+    KTRACE("Something went wrong: %f\n\n", 3.14f);
+
+    input_initialise();
 
     app_state.is_running = TRUE;
     app_state.is_suspended = FALSE;
 
     if (!event_initialise()) {
-        KFATAL("Event system failed to initialise. Application cannot continue.");
+        KFATAL("Event system failed to initialise");
         return FALSE;
     }
 
@@ -59,8 +64,13 @@ b8 application_create(game* game_inst) {
         return FALSE;
     } 
 
+    if (!renderer_initialise(game_inst->app_config.name, &app_state.platform)) {
+        KFATAL("Renderer system failed to initialise");
+        return FALSE;
+    }
+
     if (!app_state.game_inst->initialise(app_state.game_inst)) {
-        KFATAL("Game failed to initilaise");
+        KFATAL("Game failed to initialise");
         return FALSE;
     }
 
@@ -72,10 +82,16 @@ b8 application_create(game* game_inst) {
 }
 
 b8 application_run() {
-    // TODO: Sort this code
-    void* memory_status = get_memory_usage_str();
+    clock_start(&app_state.clock);
+    clock_update(&app_state.clock);
+    app_state.last_time = app_state.clock.elapsed;
+    f64 running_time = 0;
+    u8 frame_count = 0;
+    f64 target_frame_seconds = 1.0f / 60;
+
+    char* memory_status = get_memory_usage_str();
     KINFO(memory_status);
-    kfree(memory_status, 0, MEMORY_TAG_UNKNOWN);
+    kfree(memory_status, 0, MEMORY_TAG_STRING);
 
     while(app_state.is_running) {
         if (!platform_pump_messages(&app_state.platform)) {
@@ -83,19 +99,47 @@ b8 application_run() {
         }
 
         if (!app_state.is_suspended) {
-            if (!app_state.game_inst->update(app_state.game_inst, (f32)0)) {
-                KFATAL("Game update failed, shutting down");
+            clock_update(&app_state.clock);
+            f64 current_time = app_state.clock.elapsed;
+            f64 delta = (current_time - app_state.last_time);
+            f64 frame_start_time = platform_get_absolute_time();
+
+            if (!app_state.game_inst->update(app_state.game_inst, (f32)delta)) {
+                KFATAL("Game update failed, shutting down...");
                 app_state.is_running = FALSE;
                 break;
             }
 
-            if (!app_state.game_inst->render(app_state.game_inst, (f32)0)) {
-                KFATAL("Game render failed, shutting down");
+            if (!app_state.game_inst->render(app_state.game_inst, (f32)delta)) {
+                KFATAL("Game render failed, shutting down...");
                 app_state.is_running = FALSE;
                 break;
             }
 
-            input_update(0);
+            render_packet packet;
+            packet.delta_time = delta;
+
+            renderer_draw_frame(&packet);
+
+            f64 frame_end_time = platform_get_absolute_time();
+            f64 frame_elapsed_time = frame_end_time - frame_start_time;
+            running_time += frame_elapsed_time;
+            f64 remaining_seconds = target_frame_seconds - frame_elapsed_time;
+
+            if (remaining_seconds > 0) {
+                u64 remaining_ms = (remaining_seconds * 1000);
+
+                b8 limit_frames = FALSE;
+                if (remaining_ms > 0 && limit_frames) {
+                    platform_sleep(remaining_ms - 1);
+                }
+
+                frame_count++;
+            }
+
+            input_update(delta);
+
+            app_state.last_time = current_time;
         }
     }
 
@@ -107,16 +151,17 @@ b8 application_run() {
 
     event_shutdown();
     input_shutdown();
+    renderer_shutdown();
 
     platform_shutdown(&app_state.platform);
-
+    
     return TRUE;
 }
 
 b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context) {
     switch (code) {
         case EVENT_CODE_APPLICATION_QUIT: {
-            KINFO("EVENT_CODE_APPLICATION_QUIT recieved, shutting down");
+            KINFO("EVENT_CODE_APPLICATION_QUIT recieved, shutting down...");
             app_state.is_running = FALSE;
             return TRUE;
         }
