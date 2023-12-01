@@ -146,7 +146,7 @@ void vulkan_device_query_swapchain_support(VkPhysicalDevice physical_device, VkS
   VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &out_support_info->format_count, 0));
 
   if (out_support_info->format_count != 0) {
-    if (out_support_info->formats) {
+    if (!out_support_info->formats) {
       out_support_info->formats = kallocate(sizeof(VkSurfaceFormatKHR) * out_support_info->format_count, MEMORY_TAG_RENDERER);
     }
     VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &out_support_info->format_count, out_support_info->formats));
@@ -155,7 +155,7 @@ void vulkan_device_query_swapchain_support(VkPhysicalDevice physical_device, VkS
   VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &out_support_info->present_mode_count, 0));
 
   if (out_support_info->present_mode_count != 0) {
-    if (out_support_info->present_modes) {
+    if (!out_support_info->present_modes) {
       out_support_info->present_modes = kallocate(sizeof(VkPresentModeKHR) * out_support_info->present_mode_count, MEMORY_TAG_RENDERER);
     }
     VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &out_support_info->present_mode_count, out_support_info->present_modes));
