@@ -3,6 +3,7 @@
 #include "core/logger.h"
 #include "core/kmemory.h"
 #include "vulkan_device.h"
+#include "vulkan_image.h"
 
 void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* swapchain);
 void destroy(vulkan_context* context, vulkan_swapchain* swapchain);
@@ -194,6 +195,8 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
     TRUE,
     VK_IMAGE_ASPECT_DEPTH_BIT,
     &swapchain->depth_attachment);
+
+  KINFO("Swapchain created successfully");
 }
 
 void destroy(vulkan_context* context, vulkan_swapchain* swapchain) {

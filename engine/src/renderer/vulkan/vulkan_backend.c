@@ -3,6 +3,7 @@
 #include "vulkan_types.inl"
 #include "vulkan_platform.h"
 #include "vulkan_device.h"
+#include "vulkan_swapchain.h"
 
 #include "core/logger.h"
 #include "core/kstring.h"
@@ -126,11 +127,16 @@ b8 vulkan_renderer_backend_initialise(renderer_backend* backend, const char* app
     return FALSE;
   }
 
+  vulkan_swapchain_create(&context, context.framebuffer_width, context.framebuffer_height, &context.swapchain);
+
   KINFO("Vulkan renderer initialised successfully");
   return TRUE;
 }
 
 void vulkan_renderer_backend_shutdown(renderer_backend* backend) {
+
+  KDEBUG("Destroying swapchain");
+  vulkan_swapchain_destroy(&context, &context.swapchain);
 
   KDEBUG("Destroying Vulkan device...");
   vulkan_device_destroy(&context);

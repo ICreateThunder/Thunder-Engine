@@ -177,9 +177,8 @@ b8 vulkan_device_detect_depth_format(vulkan_device* device) {
       device->depth_format = candidates[i];
       return TRUE;
     }
-
-    return FALSE;
   }
+  return FALSE;
 }
 
 b8 select_physical_device(vulkan_context* context) {
