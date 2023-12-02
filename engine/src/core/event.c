@@ -1,16 +1,15 @@
 #include "core/event.h"
 
 #include "core/kmemory.h"
-#include "core/logger.h" // TODO: Remove
 #include "containers/darray.h"
 
 typedef struct registered_event {
-    void* listener;
+    void *listener;
     PFN_on_event callback;
 } registered_event;
 
 typedef struct event_code_entry {
-    registered_event* events;
+    registered_event *events;
 } event_code_entry;
 
 #define MAX_MESSAGE_CODES 16384
@@ -26,7 +25,7 @@ static b8 is_initialised = FALSE;
 static event_system_state state;
 
 b8 event_initialise() {
-    if (is_initialised == TRUE) { 
+    if (is_initialised == TRUE) {
         return FALSE;
     }
 
@@ -36,7 +35,6 @@ b8 event_initialise() {
 
     is_initialised = TRUE;
 
-    KINFO("Event subsystem initialised");
     return TRUE;
 }
 
@@ -49,7 +47,7 @@ void event_shutdown() {
     }
 }
 
-b8 event_register(u16 code, void* listener, PFN_on_event on_event) {
+b8 event_register(u16 code, void *listener, PFN_on_event on_event) {
     if (is_initialised == FALSE) {
         // TODO: Warn
         return FALSE;
@@ -70,12 +68,13 @@ b8 event_register(u16 code, void* listener, PFN_on_event on_event) {
     registered_event event;
     event.listener = listener;
     event.callback = on_event;
-    darray_push(state.registered[code].events, event);;
+    darray_push(state.registered[code].events, event);
+    ;
 
-    return TRUE;   
+    return TRUE;
 }
 
-b8 event_unregister(u16 code, void* listener, PFN_on_event on_event) {
+b8 event_unregister(u16 code, void *listener, PFN_on_event on_event) {
     if (is_initialised == FALSE) {
         return FALSE;
     }
@@ -97,8 +96,7 @@ b8 event_unregister(u16 code, void* listener, PFN_on_event on_event) {
     return FALSE;
 }
 
-
-b8 event_fire(u16 code, void* sender, event_context context) {
+b8 event_fire(u16 code, void *sender, event_context context) {
     if (is_initialised == FALSE) {
         return FALSE;
     }

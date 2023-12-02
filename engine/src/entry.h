@@ -2,13 +2,12 @@
 
 #include "core/application.h"
 #include "core/logger.h"
-#include "game_types.h"
 #include "core/kmemory.h"
+#include "game_types.h"
 
 extern b8 create_game(game* out_game);
 
 int main(void) {
-
     initialise_memory();
 
     game game_inst;
@@ -35,7 +34,7 @@ int main(void) {
     if (!application_run()) {
         KERROR("Application did not shutdown gracefully!");
         return 2;
-    }   
+    }
 
     kfree(game_inst.state, sizeof(game_state), MEMORY_TAG_GAME);
 

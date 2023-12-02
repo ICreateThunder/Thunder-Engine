@@ -7,7 +7,7 @@ typedef struct event_context {
         i64 i64[2];
         u64 u64[2];
         f64 f64[2];
-        
+
         i32 i32[4];
         u32 u32[4];
         f32 f32[4];
@@ -23,7 +23,7 @@ typedef struct event_context {
 } event_context;
 
 // Should return true if handled
-typedef b8(*PFN_on_event)(u16 code, void* sender, void* listener_inst, event_context data);
+typedef b8 (*PFN_on_event)(u16 code, void *sender, void *listener_inst, event_context data);
 
 b8 event_initialise();
 void event_shutdown();
@@ -35,8 +35,8 @@ void event_shutdown();
  * @param listener A pointer to a listener instance. Can be 0/NULL.
  * @param on_event The callback function pointer to be invoked when the event code is fired.
  * @returns TRUE if the event is successfully registered; otherwise FALSE.
-*/
-KAPI b8 event_register(u16 code, void* listener, PFN_on_event on_event);
+ */
+KAPI b8 event_register(u16 code, void *listener, PFN_on_event on_event);
 
 /**
  * Unregister to listen for when events are sent with the provided code. If no matching
@@ -45,8 +45,8 @@ KAPI b8 event_register(u16 code, void* listener, PFN_on_event on_event);
  * @param listener A pointer to a listener instance. Can be 0/NULL.
  * @param on_event The callback function pointer to be unregistered.
  * @returns TRUE if the event is successfully unregistered; otherwise FALSE.
-*/
-KAPI b8 event_unregister(u16 code, void* listener, PFN_on_event on_event);
+ */
+KAPI b8 event_unregister(u16 code, void *listener, PFN_on_event on_event);
 
 /**
  * Fires an event to listeners of the given code. If an event handler returns
@@ -55,8 +55,8 @@ KAPI b8 event_unregister(u16 code, void* listener, PFN_on_event on_event);
  * @param listener A pointer to the sender. Can be 0/NULL.
  * @param data The event data.
  * @returns TRUE if the event is handled; otherwise FALSE.
-*/
-KAPI b8 event_fire(u16 code, void* sender, event_context context);
+ */
+KAPI b8 event_fire(u16 code, void *sender, event_context context);
 
 // System internal event codes. Application codes should use beyond 255.
 typedef enum system_event_code {
@@ -67,25 +67,25 @@ typedef enum system_event_code {
     /* Context usage:
      * u16 key_code = data.data.u16[0];
      */
-   EVENT_CODE_KEY_PRESSED = 0x02,
+    EVENT_CODE_KEY_PRESSED = 0x02,
 
     // Keyboard key released
     /* Context usage:
      * u16 key_code = data.data.u16[0];
      */
-   EVENT_CODE_KEY_RELEASED = 0x03,
+    EVENT_CODE_KEY_RELEASED = 0x03,
 
     // Mouse button pressed
     /* Context usage:
      * u16 button = data.data.u16[0];
      */
-   EVENT_CODE_BUTTON_PRESSED = 0x04,
+    EVENT_CODE_BUTTON_PRESSED = 0x04,
 
     // Mouse button released
     /* Context usage:
      * u16 button = data.data.u16[0];
      */
-   EVENT_CODE_BUTTON_RELEASED = 0x05,
+    EVENT_CODE_BUTTON_RELEASED = 0x05,
 
     // Mouse moved
     /* Context usage:

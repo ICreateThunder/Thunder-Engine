@@ -4,6 +4,7 @@
 #include "core/kstring.h"
 #include "platform/platform.h"
 
+// TODO: Custom string library
 #include <string.h>
 #include <stdio.h>
 
@@ -12,7 +13,7 @@ struct memory_stats {
     u64 tagged_allocated[MEMORY_TAG_MAX_TAGS];
 };
 
-static const char*  memory_tag_strings[MEMORY_TAG_MAX_TAGS] = {
+static const char *memory_tag_strings[MEMORY_TAG_MAX_TAGS] = {
     "UNKNOWN    ",
     "ARRAY      ",
     "DARRAY     ",
@@ -29,8 +30,7 @@ static const char*  memory_tag_strings[MEMORY_TAG_MAX_TAGS] = {
     "TRANSFORM  ",
     "ENTITY     ",
     "ENTITY_NODE",
-    "SCENE      "
-};
+    "SCENE      "};
 
 static struct memory_stats stats;
 
@@ -44,7 +44,7 @@ void shutdown_memory() {
     }
 }
 
-void* kallocate(u64 size, memory_tag tag) {
+void *kallocate(u64 size, memory_tag tag) {
     if (tag == MEMORY_TAG_UNKNOWN) {
         KWARN("kallocate called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
@@ -53,12 +53,12 @@ void* kallocate(u64 size, memory_tag tag) {
     stats.tagged_allocated[tag] += size;
 
     // TODO: Memory alignment
-    void* block = platform_allocate(size, FALSE);
+    void *block = platform_allocate(size, FALSE);
     platform_zero_memory(block, size);
     return block;
 }
 
-void kfree(void* block, u64 size, memory_tag tag) {
+void kfree(void *block, u64 size, memory_tag tag) {
     if (tag == MEMORY_TAG_UNKNOWN) {
         KWARN("kfree called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
@@ -70,19 +70,19 @@ void kfree(void* block, u64 size, memory_tag tag) {
     platform_free(block, FALSE);
 }
 
-void* kzero_memory(void* block, u64 size) {
+void *kzero_memory(void *block, u64 size) {
     return platform_zero_memory(block, size);
 }
 
-void* kcopy_memory(void* dest, const void* src, u64 size) {
+void *kcopy_memory(void *dest, const void *src, u64 size) {
     return platform_copy_memory(dest, src, size);
 }
 
-void* kset_memory(void* dest, i32 value, u64 size) {
+void *kset_memory(void *dest, i32 value, u64 size) {
     return platform_set_memory(dest, value, size);
 }
 
-char* get_memory_usage_str() {
+char *get_memory_usage_str() {
     const u64 gib = 1024 * 1024 * 1024;
     const u64 mib = 1024 * 1024;
     const u64 kib = 1024;
@@ -94,13 +94,13 @@ char* get_memory_usage_str() {
         float amount = 1.0f;
         if (stats.tagged_allocated[i] >= gib) {
             unit[0] = 'G';
-            amount = stats.tagged_allocated[i] / (float) gib;
+            amount = stats.tagged_allocated[i] / (float)gib;
         } else if (stats.tagged_allocated[i] >= mib) {
             unit[0] = 'M';
-            amount = stats.tagged_allocated[i] / (float) mib;
+            amount = stats.tagged_allocated[i] / (float)mib;
         } else if (stats.tagged_allocated[i] >= kib) {
             unit[0] = 'K';
-            amount = stats.tagged_allocated[i] / (float) kib;
+            amount = stats.tagged_allocated[i] / (float)kib;
         } else {
             unit[0] = 'B';
             unit[1] = 0;
@@ -110,6 +110,6 @@ char* get_memory_usage_str() {
         i32 length = snprintf(buffer + offset, 8000, "  %s: %.2f%s\n", memory_tag_strings[i], amount, unit);
         offset += length;
     }
-    char* out_string = string_duplicate(buffer);
+    char *out_string = string_duplicate(buffer);
     return out_string;
 }

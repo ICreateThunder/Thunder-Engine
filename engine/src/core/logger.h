@@ -14,22 +14,22 @@
 
 /**
  * @brief
- * 
+ *
  * States for logger messages
-*/
+ */
 typedef enum log_level {
     LOG_LEVEL_FATAL = 0, /**< Critical errors that cause application crash */
     LOG_LEVEL_ERROR = 1, /**< Errors that may keep application running, however expect unexpected behaviour */
-    LOG_LEVEL_WARN = 2, /**< Warnings refer to performance degradation, program should still run as expected */
-    LOG_LEVEL_INFO = 3, /**< Basic level of logging */
+    LOG_LEVEL_WARN = 2,  /**< Warnings refer to performance degradation, program should still run as expected */
+    LOG_LEVEL_INFO = 3,  /**< Basic level of logging */
     LOG_LEVEL_DEBUG = 4, /**< Debug information */
-    LOG_LEVEL_TRACE = 5 /**< Trace is verbose debugging */
+    LOG_LEVEL_TRACE = 5  /**< Trace is verbose debugging */
 } log_level;
 
 b8 initialse_logging();
 void shutdown_logging();
 
-KAPI void log_output(log_level level, const char* message, ...);
+KAPI void log_output(log_level level, const char *message, ...);
 
 #define KFATAL(message, ...) log_output(LOG_LEVEL_FATAL, message, ##__VA_ARGS__);
 

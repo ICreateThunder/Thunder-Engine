@@ -21,19 +21,20 @@
 #include <unistd.h>
 #endif
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define VK_USE_PLATFORM_XCB_KHR
 #include <vulkan/vulkan.h>
+
 #include "renderer/vulkan/vulkan_types.inl"
 
 typedef struct internal_state {
-    Display* display;
-    xcb_connection_t* connection;
+    Display *display;
+    xcb_connection_t *connection;
     xcb_window_t window;
-    xcb_screen_t* screen;
+    xcb_screen_t *screen;
     xcb_atom_t wm_protocols;
     xcb_atom_t wm_delete_win;
     VkSurfaceKHR surface;
@@ -42,15 +43,14 @@ typedef struct internal_state {
 keys translate_keycode(u32 x_keycode);
 
 b8 platform_startup(
-    platform_state* plat_state,
-    const char* application_name,
+    platform_state *plat_state,
+    const char *application_name,
     i32 x,
     i32 y,
     i32 width,
     i32 height) {
-    
     plat_state->internal_state = malloc(sizeof(internal_state));
-    internal_state* state = (internal_state*)plat_state->internal_state;
+    internal_state *state = (internal_state *)plat_state->internal_state;
 
     state->display = XOpenDisplay(NULL);
 
@@ -63,7 +63,7 @@ b8 platform_startup(
         return FALSE;
     }
 
-    const struct xcb_setup_t* setup = xcb_get_setup(state->connection);
+    const struct xcb_setup_t *setup = xcb_get_setup(state->connection);
 
     xcb_screen_iterator_t it = xcb_setup_roots_iterator(setup);
     int screen_p = 0;
@@ -77,13 +77,13 @@ b8 platform_startup(
 
     u32 event_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 
-    u32 event_values =  XCB_EVENT_MASK_BUTTON_PRESS |
-                        XCB_EVENT_MASK_BUTTON_RELEASE |
-                        XCB_EVENT_MASK_KEY_PRESS |
-                        XCB_EVENT_MASK_KEY_RELEASE |
-                        XCB_EVENT_MASK_EXPOSURE |
-                        XCB_EVENT_MASK_POINTER_MOTION |
-                        XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY;
+    u32 event_values = XCB_EVENT_MASK_BUTTON_PRESS |
+                       XCB_EVENT_MASK_BUTTON_RELEASE |
+                       XCB_EVENT_MASK_KEY_PRESS |
+                       XCB_EVENT_MASK_KEY_RELEASE |
+                       XCB_EVENT_MASK_EXPOSURE |
+                       XCB_EVENT_MASK_POINTER_MOTION |
+                       XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY;
 
     u32 value_list[] = {state->screen->black_pixel, event_values};
 
@@ -124,12 +124,12 @@ b8 platform_startup(
         strlen("WM_PROTOCOLS"),
         "WM_PROTOCOLS");
 
-    xcb_intern_atom_reply_t* wm_delete_reply = xcb_intern_atom_reply(
+    xcb_intern_atom_reply_t *wm_delete_reply = xcb_intern_atom_reply(
         state->connection,
         wm_delete_cookie,
         NULL);
 
-    xcb_intern_atom_reply_t* wm_protocols_reply = xcb_intern_atom_reply(
+    xcb_intern_atom_reply_t *wm_protocols_reply = xcb_intern_atom_reply(
         state->connection,
         wm_protocols_cookie,
         NULL);
@@ -144,7 +144,7 @@ b8 platform_startup(
         4,
         32,
         1,
-        &wm_delete_reply->atom); 
+        &wm_delete_reply->atom);
 
     xcb_map_window(state->connection, state->window);
 
@@ -157,28 +157,27 @@ b8 platform_startup(
     return TRUE;
 }
 
-void platform_shutdown(platform_state* plat_state) {
-    internal_state* state = (internal_state*) plat_state->internal_state;
+void platform_shutdown(platform_state *plat_state) {
+    internal_state *state = (internal_state *)plat_state->internal_state;
 
     XAutoRepeatOn(state->display);
 
     xcb_destroy_window(state->connection, state->window);
 }
 
-b8 platform_pump_messages(platform_state* plat_state) {
-    internal_state* state = (internal_state*) plat_state->internal_state;
+b8 platform_pump_messages(platform_state *plat_state) {
+    internal_state *state = (internal_state *)plat_state->internal_state;
 
-    xcb_generic_event_t* event;
-    xcb_client_message_event_t* cm;
+    xcb_generic_event_t *event;
+    xcb_client_message_event_t *cm;
 
     b8 quit_flagged = FALSE;
 
     while ((event = xcb_poll_for_event(state->connection))) {
-
-        switch(event->response_type & ~0x80) {
+        switch (event->response_type & ~0x80) {
             case XCB_KEY_PRESS:
             case XCB_KEY_RELEASE: {
-                xcb_key_press_event_t *kb_event = (xcb_key_press_event_t*)event;
+                xcb_key_press_event_t *kb_event = (xcb_key_press_event_t *)event;
                 b8 pressed = event->response_type == XCB_KEY_PRESS;
                 xcb_keycode_t code = kb_event->detail;
                 KeySym key_sym = XkbKeycodeToKeysym(
@@ -192,10 +191,10 @@ b8 platform_pump_messages(platform_state* plat_state) {
             } break;
             case XCB_BUTTON_PRESS:
             case XCB_BUTTON_RELEASE: {
-                xcb_button_press_event_t *mouse_event = (xcb_button_press_event_t*)event;
+                xcb_button_press_event_t *mouse_event = (xcb_button_press_event_t *)event;
                 b8 pressed = event->response_type == XCB_BUTTON_PRESS;
                 buttons mouse_button = BUTTON_MAX_BUTTONS;
-                switch(mouse_event->detail) {
+                switch (mouse_event->detail) {
                     case XCB_BUTTON_INDEX_1:
                         mouse_button = BUTTON_LEFT;
                         break;
@@ -212,20 +211,20 @@ b8 platform_pump_messages(platform_state* plat_state) {
                 }
             } break;
             case XCB_MOTION_NOTIFY: {
-                xcb_motion_notify_event_t *move_event = (xcb_motion_notify_event_t*)event;
+                xcb_motion_notify_event_t *move_event = (xcb_motion_notify_event_t *)event;
                 input_process_mouse_move(move_event->event_x, move_event->event_y);
             } break;
             case XCB_CONFIGURE_NOTIFY: {
-                xcb_configure_notify_event_t* configure_event = (xcb_configure_notify_event_t*)event;
+                xcb_configure_notify_event_t *configure_event = (xcb_configure_notify_event_t *)event;
                 event_context context;
                 context.data.u16[0] = configure_event->width;
                 context.data.u16[1] = configure_event->height;
                 event_fire(EVENT_CODE_RESIZED, 0, context);
             } break;
             case XCB_CLIENT_MESSAGE: {
-                cm = (xcb_client_message_event_t*) event;
+                cm = (xcb_client_message_event_t *)event;
 
-                if (cm ->data.data32[0] == state->wm_delete_win) {
+                if (cm->data.data32[0] == state->wm_delete_win) {
                     quit_flagged = TRUE;
                 }
             } break;
@@ -237,33 +236,33 @@ b8 platform_pump_messages(platform_state* plat_state) {
     return !quit_flagged;
 }
 
-void* platform_allocate(u64 size, b8 alligned) {
+void *platform_allocate(u64 size, b8 alligned) {
     return malloc(size);
 }
 
-void platform_free(void* block, b8 alligned) {
+void platform_free(void *block, b8 alligned) {
     free(block);
 }
 
-void* platform_zero_memory(void* block, u64 size) {
+void *platform_zero_memory(void *block, u64 size) {
     return memset(block, 0, size);
 }
 
-void* platform_copy_memory(void* dest, const void* src, u64 size) {
+void *platform_copy_memory(void *dest, const void *src, u64 size) {
     return memcpy(dest, src, size);
 }
 
-void* platform_set_memory(void* dest, i32 value, u64 size) {
+void *platform_set_memory(void *dest, i32 value, u64 size) {
     return memset(dest, value, size);
 }
 
-void platform_console_write(const char* message, u8 colour) {
-    const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;32", "1;34", "1;30"};
+void platform_console_write(const char *message, u8 colour) {
+    const char *colour_strings[] = {"0;41", "1;31", "1;33", "1;32", "1;34", "1;30"};
     printf("\033[%sm%s\033[0m", colour_strings[colour], message);
 }
 
-void platform_console_write_error(const char* message, u8 colour) {
-    const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;32", "1;34", "1;30"};
+void platform_console_write_error(const char *message, u8 colour) {
+    const char *colour_strings[] = {"0;41", "1;31", "1;33", "1;32", "1;34", "1;30"};
     printf("\033[%sm%s\033[0m", colour_strings[colour], message);
 }
 
@@ -276,7 +275,7 @@ f64 platform_get_absolute_time() {
 void platform_sleep(u64 ms) {
 #if _POSIX_C_SOURCE >= 199309L
     struct timespec ts;
-    ts.tv_sec = ms/1000;
+    ts.tv_sec = ms / 1000;
     ts.tv_nsec = (ms % 1000) * 1000 * 1000;
     nanosleep(&ts, 0);
 #else
@@ -287,14 +286,14 @@ void platform_sleep(u64 ms) {
 #endif
 }
 
-void platform_get_required_extension_names(const char*** names_darray) {
+void platform_get_required_extension_names(const char ***names_darray) {
     darray_push(*names_darray, &"VK_KHR_xcb_surface");
 }
 
-b8 platform_create_vulkan_surface(platform_state* plat_state, vulkan_context* context) {
-    internal_state* state = (internal_state*)plat_state->internal_state;
+b8 platform_create_vulkan_surface(platform_state *plat_state, vulkan_context *context) {
+    internal_state *state = (internal_state *)plat_state->internal_state;
 
-    VkXcbSurfaceCreateInfoKHR create_info = { VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR };
+    VkXcbSurfaceCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR};
     create_info.connection = state->connection;
     create_info.window = state->window;
 
@@ -321,8 +320,8 @@ keys translate_keycode(u32 x_keycode) {
             return KEY_ENTER;
         case XK_Tab:
             return KEY_TAB;
-            //case XK_Shift: return KEY_SHIFT;
-            //case XK_Control: return KEY_CONTROL;
+            // case XK_Shift: return KEY_SHIFT;
+            // case XK_Control: return KEY_CONTROL;
 
         case XK_Pause:
             return KEY_PAUSE;

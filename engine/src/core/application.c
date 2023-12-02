@@ -1,7 +1,8 @@
 #include "application.h"
 #include "game_types.h"
 
-#include "logger.h"
+#include "core/logger.h"
+
 #include "platform/platform.h"
 #include "core/kmemory.h"
 #include "core/event.h"
@@ -11,7 +12,7 @@
 #include "renderer/renderer_frontend.h"
 
 typedef struct application_state {
-    game* game_inst;
+    game *game_inst;
     b8 is_running;
     b8 is_suspended;
     platform_state platform;
@@ -24,11 +25,11 @@ typedef struct application_state {
 static b8 initialised = FALSE;
 static application_state app_state;
 
-b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context);
-b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context context);
-b8 application_on_resize(u16 code, void* sender, void* listener_inst, event_context context);
+b8 application_on_event(u16 code, void *sender, void *listener_inst, event_context context);
+b8 application_on_key(u16 code, void *sender, void *listener_inst, event_context context);
+b8 application_on_resize(u16 code, void *sender, void *listener_inst, event_context context);
 
-b8 application_create(game* game_inst) {
+b8 application_create(game *game_inst) {
     if (initialised) {
         KERROR("application_create called more than once!");
         return FALSE;
@@ -62,9 +63,9 @@ b8 application_create(game* game_inst) {
     event_register(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
     event_register(EVENT_CODE_RESIZED, 0, application_on_resize);
 
-    if (!platform_startup(&app_state.platform, game_inst->app_config.name,game_inst->app_config.start_x_pos, game_inst->app_config.start_y_pos, game_inst->app_config.start_width, game_inst->app_config.start_height)) {
+    if (!platform_startup(&app_state.platform, game_inst->app_config.name, game_inst->app_config.start_x_pos, game_inst->app_config.start_y_pos, game_inst->app_config.start_width, game_inst->app_config.start_height)) {
         return FALSE;
-    } 
+    }
 
     if (!renderer_initialise(game_inst->app_config.name, &app_state.platform)) {
         KFATAL("Renderer system failed to initialise");
@@ -91,11 +92,11 @@ b8 application_run() {
     u8 frame_count = 0;
     f64 target_frame_seconds = 1.0f / 60;
 
-    char* memory_status = get_memory_usage_str();
+    char *memory_status = get_memory_usage_str();
     KINFO(memory_status);
     kfree(memory_status, 0, MEMORY_TAG_STRING);
 
-    while(app_state.is_running) {
+    while (app_state.is_running) {
         if (!platform_pump_messages(&app_state.platform)) {
             app_state.is_running = FALSE;
         }
@@ -157,16 +158,16 @@ b8 application_run() {
     renderer_shutdown();
 
     platform_shutdown(&app_state.platform);
-    
+
     return TRUE;
 }
 
-void application_get_framebuffer_size(u32* width, u32* height) {
+void application_get_framebuffer_size(u32 *width, u32 *height) {
     *width = app_state.width;
     *height = app_state.height;
 }
 
-b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context) {
+b8 application_on_event(u16 code, void *sender, void *listener_inst, event_context context) {
     switch (code) {
         case EVENT_CODE_APPLICATION_QUIT: {
             KINFO("EVENT_CODE_APPLICATION_QUIT recieved, shutting down...");
@@ -178,7 +179,7 @@ b8 application_on_event(u16 code, void* sender, void* listener_inst, event_conte
     return FALSE;
 }
 
-b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context context) {
+b8 application_on_key(u16 code, void *sender, void *listener_inst, event_context context) {
     if (code == EVENT_CODE_KEY_PRESSED) {
         u16 key_code = context.data.u16[0];
         if (key_code == KEY_ESCAPE) {
@@ -191,12 +192,12 @@ b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context
     } else if (code == EVENT_CODE_KEY_RELEASED) {
         u16 key_code = context.data.u16[0];
         KDEBUG("'%c' key released in window.", key_code);
-    }    
+    }
 
     return FALSE;
 }
 
-b8 application_on_resize(u16 code, void* sender, void* listener_inst, event_context context) {
+b8 application_on_resize(u16 code, void *sender, void *listener_inst, event_context context) {
     if (code == EVENT_CODE_RESIZED) {
         u16 width = context.data.u16[0];
         u16 height = context.data.u16[1];
@@ -220,7 +221,6 @@ b8 application_on_resize(u16 code, void* sender, void* listener_inst, event_cont
                 renderer_on_resized(width, height);
             }
         }
-        
     }
     return FALSE;
 }

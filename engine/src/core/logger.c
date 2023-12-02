@@ -1,5 +1,6 @@
-#include "logger.h"
-#include "asserts.h"
+#include "core/logger.h"
+
+#include "core/asserts.h"
 #include "platform/platform.h"
 
 // TODO: Temporary usage of standard libraries to write out
@@ -7,7 +8,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-void report_assertion_failure(const char* expression, const char* message, const char* file, i32 line) {
+void report_assertion_failure(const char *expression, const char *message, const char *file, i32 line) {
     log_output(LOG_LEVEL_FATAL, "Assertion Failure: %s, message: %s, in file: %s, line: %d\n", expression, message, file, line);
 }
 
@@ -20,8 +21,8 @@ void shutdown_logging() {
     // TODO: Cleanup logging/write queued entries
 }
 
-void log_output(log_level level, const char* message, ...) {
-    const char* level_strings[6] = {"[!] FATAL :: ", "[!] ERROR :: ", "[-] WARN :: ", "[-] INFO :: ", "[-] DEBUG :: ", "[-] TRACE :: "};
+void log_output(log_level level, const char *message, ...) {
+    const char *level_strings[6] = {"[!] FATAL :: ", "[!] ERROR :: ", "[-] WARN :: ", "[-] INFO :: ", "[-] DEBUG :: ", "[-] TRACE :: "};
     b8 is_error = level < LOG_LEVEL_WARN;
 
     const i32 msg_length = 32000;
@@ -39,6 +40,6 @@ void log_output(log_level level, const char* message, ...) {
     if (is_error) {
         platform_console_write_error(out_message2, level);
     } else {
-        platform_console_write(out_message2, level); 
+        platform_console_write(out_message2, level);
     }
 }
