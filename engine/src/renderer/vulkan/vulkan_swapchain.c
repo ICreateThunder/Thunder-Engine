@@ -112,7 +112,7 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
     context->surface,
     &context->device.swapchain_support);
 
-  if (context->device.swapchain_support.capabilities.currentExtent.width != (u32)0xffffffff) {
+  if (context->device.swapchain_support.capabilities.currentExtent.width != UINT32_MAX) {
     swapchain_extent = context->device.swapchain_support.capabilities.currentExtent;
   }
 
@@ -202,6 +202,7 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
 }
 
 void destroy(vulkan_context* context, vulkan_swapchain* swapchain) {
+  vkDeviceWaitIdle(context->device.logical_device);
   vulkan_image_destroy(context, &swapchain->depth_attachment);
 
   for (u32 i = 0; i < swapchain->image_count; ++i) {
