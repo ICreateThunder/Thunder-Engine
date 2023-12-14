@@ -2,13 +2,12 @@
 
 #include "core/application.h"
 #include "core/logger.h"
-#include "core/kmemory.h"
 #include "game_types.h"
 
 extern b8 create_game(game* out_game);
 
 int main(void) {
-    initialise_memory();
+    
 
     game game_inst;
 
@@ -36,14 +35,7 @@ int main(void) {
         return 2;
     }
 
-    kfree(game_inst.state, sizeof(game_state), MEMORY_TAG_GAME);
-
-    /* MEMORY STATUS AFTER SUBSYSTEMS SHUTDOWN */
-    char* memory_status = get_memory_usage_str();
-    KINFO(memory_status);
-    kfree(memory_status, 0, MEMORY_TAG_STRING);
-
-    shutdown_memory();
+    
 
     return 0;
 }

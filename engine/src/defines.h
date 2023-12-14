@@ -16,7 +16,7 @@ typedef float f32;
 typedef double f64;
 
 typedef int b32;
-typedef char b8;
+typedef _Bool b8;
 
 // Test to ensure types have correct size
 
@@ -39,8 +39,8 @@ STATIC_ASSERT(sizeof(i64) == 8, "Expected i64 to be 8 bytes");
 STATIC_ASSERT(sizeof(f32) == 4, "Expected f32 to be 4 bytes");
 STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes");
 
-#define TRUE 1
-#define FALSE 0
+#define true 1
+#define false 0
 
 // Platform detection
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)

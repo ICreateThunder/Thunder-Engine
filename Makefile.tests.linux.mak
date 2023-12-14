@@ -2,10 +2,10 @@
 BUILD_DIR := bin
 OBJ_DIR := obj
 
-ASSEMBLY := sandbox
+ASSEMBLY := tests
 EXTENSION := 
 COMPILER_FLAGS := -g -MD -Werror=vla -fdeclspec -fPIC
-INCLUDE_FLAGS := -Iengine/src -Isandbox\src 
+INCLUDE_FLAGS := -Iengine/src -Itests\src 
 LINKER_FLAGS := -L./$(BUILD_DIR)/ -lengine -Wl,-rpath,.
 DEFINES := -D_DEBUG -DKIMPORT
 

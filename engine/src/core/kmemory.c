@@ -16,6 +16,7 @@ struct memory_stats {
 static const char *memory_tag_strings[MEMORY_TAG_MAX_TAGS] = {
     "UNKNOWN    ",
     "ARRAY      ",
+    "LINEAR ALLC",
     "DARRAY     ",
     "DICT       ",
     "RING_QUEUE ",
@@ -32,16 +33,30 @@ static const char *memory_tag_strings[MEMORY_TAG_MAX_TAGS] = {
     "ENTITY_NODE",
     "SCENE      "};
 
-static struct memory_stats stats;
+typedef struct memory_system_state {
+    struct memory_stats stats;
+    u64 alloc_count;
+} memory_system_state;
 
-void initialise_memory() {
-    platform_zero_memory(&stats, sizeof(stats));
+static memory_system_state* state_ptr;
+
+void initialise_memory(u64* memory_requirement, void* state) {
+    *memory_requirement = sizeof(memory_system_state);
+    if (state == 0) {
+        return;
+    }
+
+    state_ptr = state;
+    state_ptr->alloc_count = 0;
+    platform_zero_memory(&state_ptr->stats, sizeof(state_ptr->stats));
 }
 
-void shutdown_memory() {
-    if (stats.total_allocated != 0) {
-        KERROR("Memory subsystem shutdown with outstanding memory allocated! Outstanding: %i", stats.total_allocated);
+void shutdown_memory(void* state) {
+    if (state_ptr->stats.total_allocated != 0) {
+        KERROR("Memory subsystem shutdown with outstanding memory allocated! Outstanding: %i", state_ptr->stats.total_allocated);
     }
+
+    state = 0;
 }
 
 void *kallocate(u64 size, memory_tag tag) {
@@ -49,11 +64,15 @@ void *kallocate(u64 size, memory_tag tag) {
         KWARN("kallocate called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
 
-    stats.total_allocated += size;
-    stats.tagged_allocated[tag] += size;
+
+    if (state_ptr) {
+        state_ptr->stats.total_allocated += size;
+        state_ptr->stats.tagged_allocated[tag] += size;
+        state_ptr->alloc_count++;
+    }
 
     // TODO: Memory alignment
-    void *block = platform_allocate(size, FALSE);
+    void *block = platform_allocate(size, false);
     platform_zero_memory(block, size);
     return block;
 }
@@ -63,11 +82,11 @@ void kfree(void *block, u64 size, memory_tag tag) {
         KWARN("kfree called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
 
-    stats.total_allocated -= size;
-    stats.tagged_allocated[tag] -= size;
+    state_ptr->stats.total_allocated -= size;
+    state_ptr->stats.tagged_allocated[tag] -= size;
 
     // TODO: Memory alignment
-    platform_free(block, FALSE);
+    platform_free(block, false);
 }
 
 void *kzero_memory(void *block, u64 size) {
@@ -92,19 +111,19 @@ char *get_memory_usage_str() {
     for (u32 i = 0; i < MEMORY_TAG_MAX_TAGS; ++i) {
         char unit[4] = "XiB";
         float amount = 1.0f;
-        if (stats.tagged_allocated[i] >= gib) {
+        if (state_ptr->stats.tagged_allocated[i] >= gib) {
             unit[0] = 'G';
-            amount = stats.tagged_allocated[i] / (float)gib;
-        } else if (stats.tagged_allocated[i] >= mib) {
+            amount = state_ptr->stats.tagged_allocated[i] / (float)gib;
+        } else if (state_ptr->stats.tagged_allocated[i] >= mib) {
             unit[0] = 'M';
-            amount = stats.tagged_allocated[i] / (float)mib;
-        } else if (stats.tagged_allocated[i] >= kib) {
+            amount = state_ptr->stats.tagged_allocated[i] / (float)mib;
+        } else if (state_ptr->stats.tagged_allocated[i] >= kib) {
             unit[0] = 'K';
-            amount = stats.tagged_allocated[i] / (float)kib;
+            amount = state_ptr->stats.tagged_allocated[i] / (float)kib;
         } else {
             unit[0] = 'B';
             unit[1] = 0;
-            amount = (float)stats.tagged_allocated[i];
+            amount = (float)state_ptr->stats.tagged_allocated[i];
         }
 
         i32 length = snprintf(buffer + offset, 8000, "  %s: %.2f%s\n", memory_tag_strings[i], amount, unit);
@@ -112,4 +131,11 @@ char *get_memory_usage_str() {
     }
     char *out_string = string_duplicate(buffer);
     return out_string;
+}
+
+u64 get_memory_alloc_count() {
+    if (state_ptr) {
+        return state_ptr->alloc_count;
+    }
+    return 0;
 }

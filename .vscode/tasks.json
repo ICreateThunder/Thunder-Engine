@@ -37,6 +37,23 @@
         },
         {
             "type": "shell",
+            "label": "Build Tests",
+            "windows": {
+                "command": "${workspaceFolder}/tests/build.bat"
+            },
+            "linux": {
+                "command": "${workspaceFolder}/tests/build.sh"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/tests"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group":"build"
+        },
+        {
+            "type": "shell",
             "label": "Build Everything",
             "windows": {
                 "command": "${workspaceFolder}/build-all.bat",
@@ -63,6 +80,20 @@
             },
             "linux": {
                 "command": "${workspaceFolder}/clean-all.sh",
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build"
+        },
+        {
+            "type": "shell",
+            "label": "Post-Build",
+            "windows": {
+                "command": "${workspaceFolder}\\post-build.bat",
+            },
+            "linux": {
+                "command": "${workspaceFolder}/post-build.sh",
             },
             "options": {
                 "cwd": "${workspaceFolder}"

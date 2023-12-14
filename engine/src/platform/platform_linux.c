@@ -60,7 +60,7 @@ b8 platform_startup(
 
     if (xcb_connection_has_error(state->connection)) {
         KFATAL("Failed to connect to X server via XCB");
-        return FALSE;
+        return false;
     }
 
     const struct xcb_setup_t *setup = xcb_get_setup(state->connection);
@@ -151,10 +151,10 @@ b8 platform_startup(
     i32 stream_result = xcb_flush(state->connection);
     if (stream_result <= 0) {
         KFATAL("Occured when flashing the stream");
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 void platform_shutdown(platform_state *plat_state) {
@@ -171,7 +171,7 @@ b8 platform_pump_messages(platform_state *plat_state) {
     xcb_generic_event_t *event;
     xcb_client_message_event_t *cm;
 
-    b8 quit_flagged = FALSE;
+    b8 quit_flagged = false;
 
     while ((event = xcb_poll_for_event(state->connection))) {
         switch (event->response_type & ~0x80) {
@@ -225,7 +225,7 @@ b8 platform_pump_messages(platform_state *plat_state) {
                 cm = (xcb_client_message_event_t *)event;
 
                 if (cm->data.data32[0] == state->wm_delete_win) {
-                    quit_flagged = TRUE;
+                    quit_flagged = true;
                 }
             } break;
             default:
@@ -305,11 +305,11 @@ b8 platform_create_vulkan_surface(platform_state *plat_state, vulkan_context *co
 
     if (result != VK_SUCCESS) {
         KFATAL("Vulkan surface creation failed");
-        return FALSE;
+        return false;
     }
 
     context->surface = state->surface;
-    return TRUE;
+    return true;
 }
 
 keys translate_keycode(u32 x_keycode) {
@@ -477,8 +477,10 @@ keys translate_keycode(u32 x_keycode) {
         case XK_Control_R:
             return KEY_RCONTROL;
         // case XK_Menu: return KEY_LMENU;
-        case XK_Menu:
-            return KEY_RMENU;
+        case XK_Alt_L:
+            return KEY_LALT;
+        case XK_Alt_R:
+            return KEY_RALT;
 
         case XK_semicolon:
             return KEY_SEMICOLON;

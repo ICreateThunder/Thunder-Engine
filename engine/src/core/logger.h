@@ -26,10 +26,18 @@ typedef enum log_level {
     LOG_LEVEL_TRACE = 5  /**< Trace is verbose debugging */
 } log_level;
 
-b8 initialse_logging();
-void shutdown_logging();
+/**
+ * @brief Initialises logging subsystem. Call twice, once with state = 0 for required memory,
+ * then a second time passing allocated memory to state
+ * 
+ * @param memory_requirement A pointer to hold the required memory size of internal state
+ * @param state 0 for memory requirement request, otherwise pointer to allocated block of memory
+ * @return b8 true on success; otherwise false
+ */
+b8 initialise_logging(u64* memory_requirement, void* state);
+void shutdown_logging(void* state);
 
-KAPI void log_output(log_level level, const char *message, ...);
+KAPI void log_output(log_level level, const char* message, ...);
 
 #define KFATAL(message, ...) log_output(LOG_LEVEL_FATAL, message, ##__VA_ARGS__);
 
