@@ -25,8 +25,15 @@ typedef struct event_context {
 // Should return true if handled
 typedef b8 (*PFN_on_event)(u16 code, void *sender, void *listener_inst, event_context data);
 
-b8 event_initialise();
-void event_shutdown();
+/**
+ * @brief Initialises memory subsystem. Call twice, once with state = 0 for required memory,
+ * then a second time passing allocated memory to state
+ * 
+ * @param memory_requirement A pointer to hold the required memory size of internal state
+ * @param state 0 for memory requirement request, otherwise pointer to allocated block of memory
+ */
+void event_system_initialise(u64* memory_requirement, void* state);
+void event_system_shutdown(void* state);
 
 /**
  * Register to listen for when events are sent with the provided code. Events with duplicate

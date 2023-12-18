@@ -40,7 +40,7 @@ typedef struct memory_system_state {
 
 static memory_system_state* state_ptr;
 
-void initialise_memory(u64* memory_requirement, void* state) {
+void memory_system_initialise(u64* memory_requirement, void* state) {
     *memory_requirement = sizeof(memory_system_state);
     if (state == 0) {
         return;
@@ -49,9 +49,11 @@ void initialise_memory(u64* memory_requirement, void* state) {
     state_ptr = state;
     state_ptr->alloc_count = 0;
     platform_zero_memory(&state_ptr->stats, sizeof(state_ptr->stats));
+
+    KINFO("Memory subsystem initialised");
 }
 
-void shutdown_memory(void* state) {
+void memory_system_shutdown(void* state) {
     if (state_ptr->stats.total_allocated != 0) {
         KERROR("Memory subsystem shutdown with outstanding memory allocated! Outstanding: %i", state_ptr->stats.total_allocated);
     }
@@ -82,8 +84,10 @@ void kfree(void *block, u64 size, memory_tag tag) {
         KWARN("kfree called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
 
-    state_ptr->stats.total_allocated -= size;
-    state_ptr->stats.tagged_allocated[tag] -= size;
+    if (state_ptr) {
+        state_ptr->stats.total_allocated -= size;
+        state_ptr->stats.tagged_allocated[tag] -= size;
+    }
 
     // TODO: Memory alignment
     platform_free(block, false);

@@ -17,18 +17,29 @@ typedef struct application_state {
     game *game_inst;
     b8 is_running;
     b8 is_suspended;
-    platform_state platform;
     i16 width;
     i16 height;
     clock clock;
     f64 last_time;
     linear_allocator systems_allocator;
 
+    u64 event_system_memory_requirement;
+    void* event_system_state;
+
     u64 memory_system_memory_requirement;
     void* memory_system_state;
 
     u64 logging_system_memory_requirement;
     void* logging_system_state;
+
+    u64 input_system_memory_requirement;
+    void* input_system_state;
+
+    u64 platform_system_memory_requirement;
+    void* platform_system_state;
+
+    u64 renderer_system_memory_requirement;
+    void* renderer_system_state;
 } application_state;
 
 static application_state *app_state;
@@ -55,10 +66,15 @@ b8 application_create(game *game_inst) {
 
     // Initialise subsystems
 
+    // Events
+    event_system_initialise(&app_state->event_system_memory_requirement, 0);
+    app_state->event_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->event_system_memory_requirement);
+    event_system_initialise(&app_state->event_system_memory_requirement, app_state->event_system_state);
+
     // Memory
-    initialise_memory(&app_state->memory_system_memory_requirement, 0);
+    memory_system_initialise(&app_state->memory_system_memory_requirement, 0);
     app_state->memory_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->memory_system_memory_requirement);
-    initialise_memory(&app_state->memory_system_memory_requirement, app_state->memory_system_state);
+    memory_system_initialise(&app_state->memory_system_memory_requirement, app_state->memory_system_state);
 
     // Logging
     initialise_logging(&app_state->logging_system_memory_requirement, 0);
@@ -68,23 +84,26 @@ b8 application_create(game *game_inst) {
         return false;
     }
 
-    input_initialise();
-
-    if (!event_initialise()) {
-        KFATAL("Event system failed to initialise");
-        return false;
-    }
+    // Input
+    input_system_initialise(&app_state->input_system_memory_requirement, 0);
+    app_state->input_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->input_system_memory_requirement);
+    input_system_initialise(&app_state->input_system_memory_requirement, app_state->input_system_state);
 
     event_register(EVENT_CODE_APPLICATION_QUIT, 0, application_on_event);
     event_register(EVENT_CODE_KEY_PRESSED, 0, application_on_key);
     event_register(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
     event_register(EVENT_CODE_RESIZED, 0, application_on_resize);
 
-    if (!platform_startup(&app_state->platform, game_inst->app_config.name, game_inst->app_config.start_x_pos, game_inst->app_config.start_y_pos, game_inst->app_config.start_width, game_inst->app_config.start_height)) {
+    // Platform
+    platform_system_startup(&app_state->platform_system_memory_requirement, 0, 0, 0, 0, 0, 0);
+    app_state->platform_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->platform_system_memory_requirement);
+    if (!platform_system_startup(&app_state->platform_system_memory_requirement, app_state->platform_system_state, game_inst->app_config.name, game_inst->app_config.start_x_pos, game_inst->app_config.start_y_pos, game_inst->app_config.start_width, game_inst->app_config.start_height)) {
         return false;
     }
 
-    if (!renderer_initialise(game_inst->app_config.name, &app_state->platform)) {
+    renderer_system_initialise(&app_state->renderer_system_memory_requirement, 0, 0);
+    app_state->renderer_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->renderer_system_memory_requirement);
+    if (!renderer_system_initialise(&app_state->renderer_system_memory_requirement, app_state->renderer_system_state, game_inst->app_config.name)) {
         KFATAL("Renderer system failed to initialise");
         return false;
     }
@@ -113,7 +132,7 @@ b8 application_run() {
     kfree(memory_status, 0, MEMORY_TAG_STRING);
 
     while (app_state->is_running) {
-        if (!platform_pump_messages(&app_state->platform)) {
+        if (!platform_pump_messages()) {
             app_state->is_running = false;
         }
 
@@ -169,13 +188,22 @@ b8 application_run() {
     event_unregister(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
     event_unregister(EVENT_CODE_RESIZED, 0, application_on_resize);
 
-    event_shutdown();
-    input_shutdown();
-    renderer_shutdown();
+    memory_status = get_memory_usage_str();
+    KINFO(memory_status);
+    kfree(memory_status, 0, MEMORY_TAG_STRING);
 
-    platform_shutdown(&app_state->platform);
+    input_system_shutdown(app_state->input_system_state);
 
-    shutdown_memory(&app_state->memory_system_state);
+    renderer_system_shutdown(app_state->renderer_system_state);
+
+    platform_system_shutdown(app_state->platform_system_state);
+
+    memory_system_shutdown(app_state->memory_system_state);
+    
+    event_system_shutdown(app_state->event_system_state);
+
+    // FREE MEMORY FROM ALLOCATOR
+    linear_allocator_destroy(&app_state->systems_allocator);
 
     return true;
 }

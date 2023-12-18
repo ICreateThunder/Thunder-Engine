@@ -142,8 +142,15 @@ typedef enum keys {
     KEYS_MAX_KEYS
 } keys;
 
-void input_initialise();
-void input_shutdown();
+/**
+ * @brief Initialises input subsystem. Call twice, once with state = 0 for required memory,
+ * then a second time passing allocated memory to state
+ * 
+ * @param memory_requirement A pointer to hold the required memory size of internal state
+ * @param state 0 for memory requirement request, otherwise pointer to allocated block of memory
+ */
+void input_system_initialise(u64* memory_requirement, void* state);
+void input_system_shutdown(void* state);
 void input_update(f64 delta_time);
 
 KAPI b8 input_is_key_down(keys key);

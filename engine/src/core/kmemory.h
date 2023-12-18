@@ -25,8 +25,15 @@ typedef enum memory_tag {
     MEMORY_TAG_MAX_TAGS
 } memory_tag;
 
-KAPI void initialise_memory(u64* memory_requirement, void* state);
-KAPI void shutdown_memory(void* state);
+/**
+ * @brief Initialises memory subsystem. Call twice, once with state = 0 for required memory,
+ * then a second time passing allocated memory to state
+ * 
+ * @param memory_requirement A pointer to hold the required memory size of internal state
+ * @param state 0 for memory requirement request, otherwise pointer to allocated block of memory
+ */
+KAPI void memory_system_initialise(u64* memory_requirement, void* state);
+KAPI void memory_system_shutdown(void* state);
 
 KAPI void *kallocate(u64 size, memory_tag tag);
 KAPI void kfree(void *block, u64 size, memory_tag tag);

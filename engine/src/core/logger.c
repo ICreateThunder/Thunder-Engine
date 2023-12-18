@@ -35,6 +35,8 @@ b8 initialise_logging(u64* memory_requirement, void* state) {
     KDEBUG("Something went wrong: %f", 3.14f);
     KTRACE("Something went wrong: %f\n\n", 3.14f);
 
+    KINFO("Logging subsystem initialised");
+
     // TODO: Create logfile
     return true;
 }
