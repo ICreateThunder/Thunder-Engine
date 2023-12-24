@@ -8,6 +8,16 @@
 #define VK_CHECK(expr) \
     { KASSERT(expr == VK_SUCCESS); }
 
+typedef struct vulkan_buffer {
+    u64 total_size;
+    VkBuffer handle;
+    VkBufferUsageFlagBits usage;
+    b8 is_locked;
+    VkDeviceMemory memory;
+    i32 memory_index;
+    u32 memory_property_flags;
+} vulkan_buffer;
+
 typedef struct vulkan_swapchain_support_info {
     VkSurfaceCapabilitiesKHR capabilities;
     u32 format_count;
@@ -132,6 +142,10 @@ typedef struct vulkan_context {
     vulkan_device device;
     vulkan_swapchain swapchain;
     vulkan_renderpass main_renderpass;
+    vulkan_buffer object_vertex_buffer;
+    vulkan_buffer object_index_buffer;
+    u64 geometry_vertex_offset;
+    u64 geometry_index_offset;
     vulkan_command_buffer* graphics_command_buffers;
     VkSemaphore* image_available_semaphores;
     VkSemaphore* queue_complete_semaphores;

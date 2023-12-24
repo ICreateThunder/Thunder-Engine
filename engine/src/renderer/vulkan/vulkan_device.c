@@ -39,10 +39,10 @@ b8 vulkan_device_create(vulkan_context *context) {
     }
 
     KINFO("Creating logical device...");
-    b8 present_shares_grahpics_queue = context->device.graphics_queue_index == context->device.present_queue_index;
+    b8 present_shares_graphics_queue = context->device.graphics_queue_index == context->device.present_queue_index;
     b8 transfer_shares_graphics_queue = context->device.graphics_queue_index == context->device.transfer_queue_index;
     u32 index_count = 1;
-    if (!present_shares_grahpics_queue) {
+    if (!present_shares_graphics_queue) {
         index_count++;
     }
     if (!transfer_shares_graphics_queue) {
@@ -51,7 +51,7 @@ b8 vulkan_device_create(vulkan_context *context) {
     u32 indices[32];
     u8 index = 0;
     indices[index++] = context->device.graphics_queue_index;
-    if (!present_shares_grahpics_queue) {
+    if (!present_shares_graphics_queue) {
         indices[index++] = context->device.present_queue_index;
     }
     if (!transfer_shares_graphics_queue) {
@@ -60,13 +60,15 @@ b8 vulkan_device_create(vulkan_context *context) {
 
     VkDeviceQueueCreateInfo queue_create_infos[32];
 
+    // TODO: Fix logic to utilise number of queues from VkGetPhysicalDeviceProperties as opposed to setting the amount directly.
     for (u32 i = 0; i < index_count; ++i) {
         queue_create_infos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queue_create_infos[i].queueFamilyIndex = indices[i];
         queue_create_infos[i].queueCount = 1;
-        if (indices[i] == context->device.graphics_queue_index) {
-            queue_create_infos[i].queueCount = 2;
-        }
+        // NOTE: Following broke on a graphics card with only 1 physical device graphics queue
+        // if (indices[i] == context->device.graphics_queue_index) {
+        //     queue_create_infos[i].queueCount = 2;
+        // }
         queue_create_infos[i].flags = 0;
         queue_create_infos[i].pNext = 0;
         f32 queue_priority = 1.0f;
