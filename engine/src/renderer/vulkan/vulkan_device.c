@@ -79,6 +79,23 @@ b8 vulkan_device_create(vulkan_context *context) {
     VkPhysicalDeviceFeatures device_features = {};
     device_features.samplerAnisotropy = VK_TRUE;
 
+    b8 portability_required = false;
+    u32 available_extension_count = 0;
+    VkExtensionProperties* available_extensions = 0;
+    VK_CHECK(vkEnumerateDeviceExtensionProperties(context->device.physical_device, 0, &available_extension_count, 0));
+    if (available_extension_count != 0) {
+        available_extensions = kallocate(sizeof(VkExtensionProperties) * available_extension_count, MEMORY_TAG_RENDERER);
+        VK_CHECK(vkEnumerateDeviceExtensionProperties(context->device.physical_device, 0, &available_extension_count, available_extensions));
+        for (u32 i = 0; i < available_extension_count; ++i) {
+            if (strings_equal(available_extensions[i].extensionName, "VK_KHR_portability_subset")) {
+                KINFO("Adding required extension 'VK_KHR_portability_subset'.");
+                portability_required = true;
+                break;
+            }
+        }
+    }
+    kfree(available_extensions, sizeof(VkExtensionProperties) * available_extension_count, MEMORY_TAG_RENDERER);
+
     VkDeviceCreateInfo device_create_info = {VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
     device_create_info.queueCreateInfoCount = index_count;
     device_create_info.pQueueCreateInfos = queue_create_infos;
