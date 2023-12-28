@@ -690,7 +690,7 @@ KINLINE mat4 mat4_identity() {
     out_matrix.data[10] = 1.0f;
     out_matrix.data[15] = 1.0f;
     return out_matrix;
-} 
+}
 
 /**
  * @brief Returns the result of multiplying matrix_0 and matrix_1
