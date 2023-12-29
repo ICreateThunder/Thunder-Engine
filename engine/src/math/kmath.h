@@ -708,7 +708,7 @@ KINLINE mat4 mat4_mul(mat4 matrix_0, mat4 matrix_1) {
 
     for (i32 i = 0; i < 4; ++i) {
         for (i32 j = 0; j < 4; ++j) {
-            *dst_ptr = 
+            *dst_ptr =
                 m1_ptr[0] * m2_ptr[0 + j] +
                 m1_ptr[1] * m2_ptr[4 + j] +
                 m1_ptr[2] * m2_ptr[8 + j] +
@@ -834,6 +834,12 @@ KINLINE mat4 mat4_transposed(mat4 matrix) {
     return out_matrix;
 }
 
+/**
+ * @brief Creates and returns an inverse of the provided matrix.
+ * 
+ * @param matrix The matrix to be inverted.
+ * @return A inverted copy of the provided matrix. 
+ */
 KINLINE mat4 mat4_inverse(mat4 matrix) {
     const f32* m = matrix.data;
 
@@ -915,7 +921,7 @@ KINLINE mat4 mat4_scale(vec3 scale) {
 }
 
 KINLINE mat4 mat4_euler_x(f32 angle_radians) {
-    mat4 out_matrix;
+    mat4 out_matrix = mat4_identity();
     f32 c = kcos(angle_radians);
     f32 s = ksin(angle_radians);
 
@@ -927,7 +933,7 @@ KINLINE mat4 mat4_euler_x(f32 angle_radians) {
 }
 
 KINLINE mat4 mat4_euler_y(f32 angle_radians) {
-    mat4 out_matrix;
+    mat4 out_matrix = mat4_identity();
     f32 c = kcos(angle_radians);
     f32 s = ksin(angle_radians);
 
@@ -939,7 +945,8 @@ KINLINE mat4 mat4_euler_y(f32 angle_radians) {
 }
 
 KINLINE mat4 mat4_euler_z(f32 angle_radians) {
-    mat4 out_matrix;
+    mat4 out_matrix = mat4_identity();
+
     f32 c = kcos(angle_radians);
     f32 s = ksin(angle_radians);
 
@@ -960,7 +967,7 @@ KINLINE mat4 mat4_euler_xyz(f32 x_radians, f32 y_radians, f32 z_radians) {
 }
 
 /**
- * @brief Retrurns a forward vector relative to the provided matrix
+ * @brief Returns a forward vector relative to the provided matrix
  * 
  * @param matrix The matrix from which to base the vector
  * @return A 3-component directional vector
