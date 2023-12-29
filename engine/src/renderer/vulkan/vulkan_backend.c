@@ -219,7 +219,7 @@ b8 vulkan_renderer_backend_initialise(renderer_backend *backend, const char *app
     vertex_3d verts[vert_count];
     kzero_memory(verts, sizeof(vertex_3d) * vert_count);
 
-    const f32 f = 1.0f;
+    const f32 f = 10.0f;
 
     verts[0].position.x = -0.5 * f;
     verts[0].position.y = -0.5 * f;
@@ -401,16 +401,6 @@ void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_p
     context.object_shader.global_ubo.view = view;
 
     vulkan_object_shader_update_global_state(&context, &context.object_shader);
-
-    // TODO: temporary test code
-    vulkan_object_shader_use(&context, &context.object_shader);
-
-    VkDeviceSize offsets[1] = {0};
-    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &context.object_vertex_buffer.handle, (VkDeviceSize*)offsets);
-
-    vkCmdBindIndexBuffer(command_buffer->handle, context.object_index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
-
-    vkCmdDrawIndexed(command_buffer->handle, 6, 1, 0, 0, 0);
 }
 
 b8 vulkan_renderer_backend_end_frame(renderer_backend *backend, f32 delta_time) {
@@ -457,6 +447,22 @@ b8 vulkan_renderer_backend_end_frame(renderer_backend *backend, f32 delta_time) 
     vulkan_swapchain_present(&context, &context.swapchain, context.device.graphics_queue, context.device.present_queue, context.queue_complete_semaphores[context.current_frame], context.image_index);
 
     return true;
+}
+
+void vulkan_backend_update_object(mat4 model) {
+    vulkan_command_buffer *command_buffer = &context.graphics_command_buffers[context.image_index];
+
+    vulkan_object_shader_update_object(&context, &context.object_shader, model);
+
+    // TODO: temporary test code
+    vulkan_object_shader_use(&context, &context.object_shader);
+
+    VkDeviceSize offsets[1] = {0};
+    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &context.object_vertex_buffer.handle, (VkDeviceSize*)offsets);
+
+    vkCmdBindIndexBuffer(command_buffer->handle, context.object_index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+
+    vkCmdDrawIndexed(command_buffer->handle, 6, 1, 0, 0, 0);
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
