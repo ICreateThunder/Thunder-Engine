@@ -967,91 +967,91 @@ KINLINE mat4 mat4_euler_xyz(f32 x_radians, f32 y_radians, f32 z_radians) {
 }
 
 /**
- * @brief Returns a forward vector relative to the provided matrix
+ * @brief Returns a forward vector relative to the provided matrix.
  * 
- * @param matrix The matrix from which to base the vector
- * @return A 3-component directional vector
+ * @param matrix The matrix from which to base the vector.
+ * @return A 3-component directional vector.
  */
 KINLINE vec3 mat4_forward(mat4 matrix) {
     vec3 forward;
     forward.x = -matrix.data[2];
     forward.y = -matrix.data[6];
-    forward.x = -matrix.data[10];
+    forward.z = -matrix.data[10];
     vec3_normalise(&forward);
     return forward;
 }
 
 /**
- * @brief Returns a backward vector relative to the provided matrix
+ * @brief Returns a backward vector relative to the provided matrix.
  * 
- * @param matrix The matrix from which to base the vector
- * @return A 3-component directional vector
+ * @param matrix The matrix from which to base the vector.
+ * @return A 3-component directional vector.
  */
 KINLINE vec3 mat4_backward(mat4 matrix) {
     vec3 backward;
     backward.x = matrix.data[2];
     backward.y = matrix.data[6];
-    backward.x = matrix.data[10];
+    backward.z = matrix.data[10];
     vec3_normalise(&backward);
     return backward;
 }
 
 /**
- * @brief Returns a upward vector relative to the provided matrix
+ * @brief Returns a upward vector relative to the provided matrix.
  * 
- * @param matrix The matrix from which to base the vector
- * @return A 3-component directional vector
+ * @param matrix The matrix from which to base the vector.
+ * @return A 3-component directional vector.
  */
 KINLINE vec3 mat4_up(mat4 matrix) {
     vec3 up;
-    up.x = matrix.data[2];
-    up.y = matrix.data[6];
-    up.x = matrix.data[10];
+    up.x = matrix.data[1];
+    up.y = matrix.data[5];
+    up.z = matrix.data[9];
     vec3_normalise(&up);
     return up;
 }
 
 /**
- * @brief Returns a downward vector relative to the provided matrix
+ * @brief Returns a downward vector relative to the provided matrix.
  * 
- * @param matrix The matrix from which to base the vector
- * @return A 3-component directional vector
+ * @param matrix The matrix from which to base the vector.
+ * @return A 3-component directional vector.
  */
 KINLINE vec3 mat4_down(mat4 matrix) {
     vec3 down;
-    down.x = matrix.data[1];
-    down.y = matrix.data[5];
-    down.x = matrix.data[9];
+    down.x = -matrix.data[1];
+    down.y = -matrix.data[5];
+    down.z = -matrix.data[9];
     vec3_normalise(&down);
     return down;
 }
 
 /**
- * @brief Returns a left vector relative to the provided matrix
+ * @brief Returns a left vector relative to the provided matrix.
  * 
- * @param matrix The matrix from which to base the vector
- * @return A 3-component directional vector
+ * @param matrix The matrix from which to base the vector.
+ * @return A 3-component directional vector.
  */
 KINLINE vec3 mat4_left(mat4 matrix) {
     vec3 left;
-    left.x = matrix.data[0];
-    left.y = matrix.data[4];
-    left.x = matrix.data[8];
+    left.x = -matrix.data[0];
+    left.y = -matrix.data[4];
+    left.z = -matrix.data[8];
     vec3_normalise(&left);
     return left;
 }
 
 /**
- * @brief Returns a right vector relative to the provided matrix
+ * @brief Returns a right vector relative to the provided matrix.
  * 
- * @param matrix The matrix from which to base the vector
- * @return A 3-component directional vector
+ * @param matrix The matrix from which to base the vector.
+ * @return A 3-component directional vector.
  */
 KINLINE vec3 mat4_right(mat4 matrix) {
     vec3 right;
-    right.x = matrix.data[2];
-    right.y = matrix.data[6];
-    right.x = matrix.data[10];
+    right.x = matrix.data[0];
+    right.y = matrix.data[4];
+    right.z = matrix.data[8];
     vec3_normalise(&right);
     return right;
 }
